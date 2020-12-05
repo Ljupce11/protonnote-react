@@ -15,10 +15,10 @@ export const RightPane = ({ onSubmitFormHandler, isLoading, activeNote, editMode
           <input
             required
             type="text"
+            readOnly={!editMode}
+            value={formData.title}
             className="form-control"
             placeholder={activeNote || editMode ? "Enter note title" : ""}
-            disabled={!editMode}
-            value={formData.title}
             onChange={(e) => onChangeHandler(e, 'title')} />
         </div>
 
@@ -26,19 +26,19 @@ export const RightPane = ({ onSubmitFormHandler, isLoading, activeNote, editMode
           <textarea
             required
             rows="7"
+            readOnly={!editMode}
+            value={formData.text}
             className="form-control"
             placeholder={activeNote || editMode ? "Enter note text" : ""}
-            disabled={!editMode}
-            value={formData.text}
             onChange={(e) => onChangeHandler(e, 'text')} />
         </div>
 
         <ActionButtons
-          activeNote={activeNote}
           editMode={editMode}
+          activeNote={activeNote}
           onCancelHandler={onCancelHandler}
-          updateEditMode={(value) => setEditMode(value)}
-          onDeleteHandler={onDeleteHandler} />
+          onDeleteHandler={onDeleteHandler}
+          updateEditMode={(value) => setEditMode(value)} />
 
       </form>
     </div>
