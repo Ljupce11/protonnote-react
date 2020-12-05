@@ -27,17 +27,15 @@ export const Dashboard = () => {
     }
   }, [activeNote, data, formData, prevActiveNote])
 
-  const onSelectNoteHandler = (id) => {
+  const onSelectNoteHandler = async (id) => {
     if (!editMode) {
       setIsLoading(true)
       const activeNoteData = data.find(note => note.id === id)
-      decrypt(activeNoteData.text)
-        .then(res => {
-          if (res) {
-            setIsLoading(false)
-            setActiveNote(id)
-          }
-        })
+      const decryptedData = await decrypt(activeNoteData.text)
+      if (decryptedData) {
+        setIsLoading(false)
+        setActiveNote(id)
+      }
     }
   }
 
@@ -48,22 +46,19 @@ export const Dashboard = () => {
     })
   }
 
-  const onSaveHandler = () => {
+  const onSaveHandler = async () => {
     if (activeNote) {
       setIsLoading(true)
       const dataCopy = [...data]
       const activeNoteData = dataCopy.find(note => note.id === activeNote)
       activeNoteData.title = formData.title
       activeNoteData.text = formData.text
-      encrypt(activeNoteData.text)
-        .then(res => {
-          console.log(res)
-          if (res) {
-            setData(dataCopy)
-            setEditMode(false)
-            setIsLoading(false)
-          }
-        })
+      const encryptedData = await encrypt(activeNoteData.text)
+      if (encryptedData) {
+        setData(dataCopy)
+        setEditMode(false)
+        setIsLoading(false)
+      }
     }
   }
 
@@ -90,20 +85,14 @@ export const Dashboard = () => {
   const onCreateNewNoteHandler = () => {
     setIsLoading(true)
     const dataCopy = [...data]
-    dataCopy.push({
-      id: uuid(),
-      title: formData.title,
-      text: formData.text
-    })
-    encrypt(formData.title)
-      .then(res => {
-        if (res) {
-          setData(dataCopy)
-          setEditMode(false)
-          setFormData({ title: '', text: '' })
-          setIsLoading(false)
-        }
-      })
+    dataCopy.push({ id: uuid(), title: formData.title, text: formData.text })
+    const encryptedData = encrypt(formData.title)
+    if (encryptedData) {
+      setData(dataCopy)
+      setEditMode(false)
+      setFormData({ title: '', text: '' })
+      setIsLoading(false)
+    }
   }
 
   const onCancelHandler = () => {
@@ -134,15 +123,15 @@ export const Dashboard = () => {
           onSelectNoteHandler={(noteId) => onSelectNoteHandler(noteId)} />
 
         <RightPane
-          onSubmitFormHandler={onSubmitFormHandler}
-          isLoading={isLoading}
-          activeNote={activeNote}
           editMode={editMode}
           formData={formData}
-          onChangeHandler={(e, title) => onChangeHandler(e, title)}
+          isLoading={isLoading}
+          activeNote={activeNote}
           onCancelHandler={onCancelHandler}
           onDeleteHandler={onDeleteHandler}
-          setEditMode={(value) => setEditMode(value)} />
+          onSubmitFormHandler={onSubmitFormHandler}
+          setEditMode={(value) => setEditMode(value)}
+          onChangeHandler={(e, title) => onChangeHandler(e, title)} />
       </div>
     </div>
   )
